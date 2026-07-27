@@ -1,0 +1,57 @@
+CREATE database cellular_network;
+USE cellular_network;
+SELECT * FROM signal_metrics;
+ALTER TABLE signal_metrics
+DROP COLUMN `Signal Quality (%)`;
+ALTER TABLE signal_metrics
+MODIFY timestamp DATETIME;
+
+-- CEK DATA
+SELECT * FROM signal_metrics
+LIMIT 10;
+
+-- DATA CLEANING
+SELECT * FROM signal_metrics 
+WHERE `Signal Strength (dBm)` IS NULL;
+
+-- CEK DUPLIKASI
+SELECT COUNT(*) FROM signal_metrics
+GROUP BY timestamp, latitude, longitude
+HAVING COUNT(*) > 1;
+
+-- UBAH TIMESTAMP
+ALTER TABLE signal_metrics
+MODIFY timestamp DATETIME;
+
+-- SQL ANALYSIS
+SELECT
+AVG(`Signal Strength (dBm)`) 
+FROM signal_metrics;
+
+SELECT
+`Network Type`,
+COUNT(*) as jumlah
+FROM signal_metrics
+group by `Network Type`;
+
+SELECT 
+Locality,
+AVG(`Data Throughput (Mbps)`) as avg_speed
+FROM signal_metrics
+GROUP BY Locality
+ORDER BY avg_speed;
+
+SELECT
+	CASE
+		WHEN `Signal Strength (dBm)` >= -70 THEN 'Excellent'
+        WHEN `Signal Strength (dBm)` >= -85 THEN 'Good'
+        WHEN `Signal Strength (dBm)` >= -100 THEN 'Fair'
+	ELSE 'Poor'
+    End As signal_quality,
+    COUNT(*) AS total
+    FROM signal_metrics
+    GROUP BY signal_quality;
+    
+    
+
+
